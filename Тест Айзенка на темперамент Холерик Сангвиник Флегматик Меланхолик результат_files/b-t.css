@@ -1,0 +1,49 @@
+a:link.menu {text-decoration: none; font: bold 12px Arial, Geneva, Swiss, SunSans-Regular; color: #5B5B5B;}
+a:visited.menu {text-decoration: none;  font: bold 12px Arial, Geneva, Swiss, SunSans-Regular;color:#5B5B5B;}
+a:hover.menu  {text-decoration: underline; }
+
+a:link.menu1 {text-decoration: none; font: bold 12px Arial, Geneva, Swiss, SunSans-Regular; color: #5B5B5B;}
+a:visited.menu1 {text-decoration: none;  font: bold 12px Arial, Geneva, Swiss, SunSans-Regular;color:#5B5B5B;}
+a:hover.menu1  {text-decoration: underline; }
+
+A:link.menuart {text-decoration: none; font: bold 14px Times New Roman, Helvetica, Arial, Geneva, Swiss, SunSans-Regular; color: #101768;}
+A:visited.menuart {text-decoration: none;  font: bold 14px Times New Roman, Helvetica, Arial, Geneva, Swiss, SunSans-Regular;color:#101768;}
+A:hover.menuart  {text-decoration: underline; }
+
+A:link.menuart1 {text-decoration: none; font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:101768;}
+A:visited.menuart1 {text-decoration: none;  font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:101768;}
+A:hover.menuart1  {text-decoration: underline; }
+
+A:link.rekl {text-decoration: none; font: 14px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:FD0606;}
+A:visited.rekl {text-decoration: none;  font: 14px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:FD0606;}
+A:hover.rekl  {text-decoration: none;  font: 15px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:FD0606;}
+
+
+font.footer {font: 10px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:A5A5A1;}
+font.text15 {font: 13px Arial Narrow; color:5B5E5B;}
+font.text11 {font: 14px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:5B5E5B;}
+font.text11w {font: 14px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:ffffff;}
+font.text11m {font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:5B5E5B;}
+font.text11kr {font: 13px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:FD020E;}
+font.textart {font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:101768;}
+font.text10 {font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular; color:5B5E5B;}
+font.text10_menu {text-decoration: none; font: bold 10px Helvetica, Arial,Geneva, Swiss, SunSans-Regular; color: #5B5B5B;}
+
+.text_cop {font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:A5A5A1;}
+.text_7 {font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular; color:5B5E5B;}
+.text_tema {font: 13px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:5B5E5B;}
+.text_tabl {font: 14px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:5B5E5B;}
+.text_poisk {font: 10px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:A5A5A1;}
+.text_test {font: 13px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:5B5E5B;}
+.text_ban {font: 12px Arial, Helvetica, Geneva, Swiss, SunSans-Regular; color:0C2B64;}
+.text_c {font: 10px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:A5A5A1;}
+
+
+a:link.ss { font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:A5A5A1;}
+a:visited.ss {font: 11px Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  color:A5A5A1;}
+a:hover.ss  {  text-decoration: underline; }
+
+
+#runstr {font: 12px Arial, Helvetica, Geneva, Swiss, SunSans-Regular; 	color:000900; 	margin-left:21px; 	margin-right:21px;}
+
+#ind {margin-top:20px; 	margin-left : 20px;}

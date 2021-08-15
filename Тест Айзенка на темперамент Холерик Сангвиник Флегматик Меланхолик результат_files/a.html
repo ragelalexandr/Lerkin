@@ -1,0 +1,405 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Чат клиент Cloudim</title>
+	<link rel="stylesheet" type="text/css" href="a_data/widget2.css">
+
+	
+	<!-- chat -->
+						<script src="a_data/ua-parser.js" type="text/javascript"></script>
+			<script src="a_data/_chat_socket.js" type="text/javascript"></script>
+			
+	<script type="text/javascript">
+		CloudIM.uid = 14460;
+		CloudIM.offline_mode = true;
+		CloudIM.domain = 'b-t.com.ua';
+		CloudIM.url = 'http://b-t.com.ua/test_ayzenk.php';
+		CloudIM.ip = '46.216.112.81';
+		CloudIM.referer = 'http://b-t.com.ua/test_ayzenk.php';
+		CloudIM.page = 'Тест Айзенка на темперамент Холерик Сангвиник Флег';
+		
+				CloudIM.geo.city = 'Минск';
+		CloudIM.geo.country = 'Белоруссия';
+		CloudIM.geo.country_code = 'BY';
+		CloudIM.geo.lat = '53.9';
+		CloudIM.geo.lon = '27.56667';
+		
+		CloudIM.options.needName = false;
+		CloudIM.options.needEmail = false;
+		CloudIM.options.silent = false;
+		CloudIM.options.accept_chats = false;
+
+		// триггеры
+		CloudIM.triggers = [];
+
+		
+		var jsReady = false;
+		// для звука
+		function isReady() {
+			return jsReady;
+		}
+		function pageInit() {
+			jsReady = true;
+		}
+
+		function sendToActionScript(value) {
+			if (CloudIM.options.silent) {
+				return;
+			}
+
+			if (value == 'outgoing') {
+				playSound('Pop-3-8');
+			} else {
+				playSound('Pop-3-9');
+			}
+		}
+		
+		function preloadSounds () {
+			if (CloudIM.options.silent) {
+				return;
+			}
+			
+			var sounds = [
+			'Pop-3-8',
+			'Pop-3-9'//,
+			// '89_oringz-pack-nine-08'
+			];
+
+			var sound_url;
+
+			for (var i = sounds.length - 1; i >= 0; i--) {
+
+				sound_url = 'sounds/' + sounds[i];
+
+				$(
+					'<audio preload="auto" style="display:none;" id="sound__' + sounds[i] + '">'
+					  + '<source src="' + sound_url + '.mp3" type="audio/mp3" />'
+					  + '<source src="' + sound_url + '.ogg" type="audio/ogg" />'
+					+ '</audio>'
+					).appendTo('body');
+			}
+
+			return true;
+		}
+		
+		function playSound (sound) {
+			var sound_src = 'sounds/' + sound;
+			
+			return $(
+				'<audio autoplay="autoplay" autobuffer style="display:none;">'
+				  + '<source src="' + sound_src + '.mp3" type="audio/mp3" />'
+				  + '<source src="' + sound_src + '.ogg" type="audio/ogg" />'
+				+ '</audio>'
+				).appendTo('body');
+		}
+		
+		$(window).bind('message', CloudIM.scriptMessage);
+		$(window).bind('blur', function(){CloudIM.sendWindowMessage('callBlurEvent');} );
+		$(window).bind('focus', function(){CloudIM.sendWindowMessage('callFocusEvent');} );
+
+		var preMessageInterval = null;
+
+		$(document).ready(function(){
+			pageInit();
+			CloudIM.init();
+			
+			$('#im_chat .chat_greeting').html( CloudIM.insertLinks($('#im_chat .chat_greeting').text()) );
+
+			// обработчик панельки чата
+			$('.toggle_chat').bind('click', function() {
+				// открытие / закрытие чата
+				CloudIM.toggleChat();
+			});
+
+			// оценка
+			$('.btn-rate.btn-good').bind('click', function(){
+				CloudIM.setRate('good');
+
+				$('.rate-block').hide();
+				$('.rate-message-block').show();
+				
+				setTimeout(function(){
+					if ($('.rate-message-block').is(':visible')) {
+						$('.im_rate_block').slideUp();
+					}
+				}, 3000);
+			});
+			$('.btn-rate.btn-bad').bind('click', function(){
+				CloudIM.setRate('bad');
+				
+				$('.rate-block').hide();
+				$('.rate-message-block').show();
+				
+				setTimeout(function(){
+					if ($('.rate-message-block').is(':visible')) {
+						$('.im_rate_block').slideUp();
+					}
+				}, 3000);
+			});
+			
+			// обработчик ввода текста
+			$('#im_message_form').bind('keyup', function(event){
+				if (event.which == 13) {
+					send();
+					
+					// чистка таймера
+					clearTimeout(preMessageInterval);
+			        preMessageInterval = null;
+
+				} else if ($(this).val() != '') {
+					// всевидящее око
+					if (preMessageInterval === null) {
+		        		preMessageInterval = setTimeout(function(){
+			        		clearTimeout(preMessageInterval);
+			        		preMessageInterval = null;
+							CloudIM.preMessageInformer($('#im_message_form').val());
+			        	}, 1200);
+		        	}
+				}
+			});
+
+			$('.im_enter').bind('click', send);
+
+			$('#im_message_form').bind('focus', function(event){
+				if ($(this).val() == 'Введите сообщение и нажмите Enter') {
+					$(this).val('');
+					$(this).addClass('im_field_active');
+				}
+			});
+			$('#im_message_form').bind('blur', function(event){
+				if ($(this).val() == '') {
+					$(this).val('Введите сообщение и нажмите Enter');
+					$(this).removeClass('im_field_active');
+				}
+			});
+
+			$('.eula_link').bind('click', function(e){
+				e.preventDefault();
+                e.stopPropagation();
+                // показываем окно
+                CloudIM.showEula( $(this).attr('href') );
+			});
+
+			function send () {
+				var message = $.trim($('#im_message_form').val());
+				if (message != 'Введите сообщение и нажмите Enter'){
+					if (message != '') {
+						// статус отправки
+						var sended = CloudIM.sendMessage(message);
+						if (sended) {
+							// очистка
+							$('#im_message_form').val('');
+						}
+					} else {
+						$('#im_message_form').val( $.trim($('#im_message_form').val()) );
+					}
+				}
+			}
+
+			// preload sounds
+			preloadSounds();
+		});
+
+		$(window).one('beforeunload',function() {
+			CloudIM.unloadChat();
+		});
+		
+	</script>
+	
+	<style>
+	.im_title {
+		background: #2730ec;
+		}
+	</style>
+</head>
+<body>
+<div class="im_client">
+	<div class="im_title toggle_chat">
+		<div class="im_title_buttons im_toggle"></div>
+		<div class="im_head_title">Задать вопрос</div>
+		<div class="im_head_offline_title" style="display: none;">Задать вопрос</div>
+						<div class="im_panel">
+			<a title="Онлайн консультант Cloudim" target="_blank" href="http://cloudim.ru/?utm_source=http%3A%2F%2Fb-t.com.ua%2Ftest_ayzenk.php&amp;utm_medium=logo&amp;utm_content=widget&amp;utm_campaign=self_ad"><div class="cloudim-chat-label"></div></a>
+		</div>
+				<div class="im_clear"></div>
+	</div>
+	<div class="im_welcome toggle_chat" style="max-height: 150px;">
+		<img src="a.html" alt="Менеджер" class="im_avatar" width="50" height="50">
+		<div class="im_message"> 
+			<b class="im_vcard_fullname"></b>
+			<div class="im_welcome_text"></div>
+		</div>
+		<div class="im_clear"></div>
+	</div>
+	
+	<div id="im_user_profile_form">
+		<div class="im_user_profile">
+			<form id="im_user_profile_save">
+			<fieldset>
+				<p>
+					Пожалуйста представьтесь:
+				</p>
+				<div class="im_user_name">
+					<label>Имя</label> <br>
+					<input type="text" id="user_name">
+				</div>
+				<div class="im_user_email">
+					<label>Email</label><br>
+					<input type="text" id="user_email">
+				</div>
+				<div style="clear: both; font-size: 11px; padding-top: 4px;">
+					<input type="checkbox" checked="checked">
+					Согласен с <a href="http://cloudim.ru/eula/?site=b-t.com.ua" class="eula_link">политикой конфиденциальности</a>. 
+				</div>
+				<div class="submit">
+					<input type="submit" value="Войти">
+				</div>
+			</fieldset>
+			</form>
+		</div>
+		<div class="overlay"></div>
+	</div>
+
+	<div id="im_offline_form" style="display:none;">
+		<div class="im_offline">
+			<form>
+			<fieldset>
+				<p>
+					Оставьте тут свое сообщение и мы получим его на email. Обязательно ответим Вам!
+				</p>
+				<div>
+					<label>Сообщение</label><br>
+					<textarea id="offline_message" cols="30" rows="5" placeholder="Ваше сообщение"></textarea>
+				</div>
+								<div>
+					<div style="float: left;">
+						<label>Ваш email</label><br>
+						<input type="text" id="offline_email" placeholder="Ваш email для ответа">
+					</div>
+
+					<div style="float: right;">
+						<input type="submit" value="Отправить" id="offlineBtn" class="btn btn-inverse">
+					</div>
+				</div>
+
+				<div style="clear: both; font-size: 11px; padding-top: 4px;">
+					<input type="checkbox" checked="checked">
+					Согласен с <a href="http://cloudim.ru/eula/?site=b-t.com.ua" class="eula_link">политикой конфиденциальности</a>. 
+				</div>
+				
+							</fieldset>
+			</form>
+			<div class="im_footer">
+																Чат предоставлен <a href="http://cloudim.ru/?utm_source=http%3A%2F%2Fb-t.com.ua%2Ftest_ayzenk.php&amp;utm_medium=link&amp;utm_content=widget&amp;utm_campaign=self_ad" target="_blank">Cloudim.ru</a>
+							</div>
+		</div>
+		<div class="overlay"></div>
+	</div>
+
+	
+	
+	<div class="im_main" id="im_panel">
+		<div id="im_connect_status"></div>
+		
+		<div class="operators-list" style="display: none;">
+			<div class="operator" style="display: none;">
+				<div class="operator-avatar">
+					<img src="a_data/default.png" alt="">
+				</div>
+				<div class="im_vcard_data">
+					<b class="im_vcard_fullname">Оператор</b>
+					<div class="im_status">Онлайн</div>
+				</div>
+				<div class="im_clear"></div>
+			</div>
+		</div>
+
+		<div id="im_client">
+			<div class="going_offline" id="goingOffline" style="display: none;">
+				<div class="overlay"></div>
+				<div class="overlay-message">
+					<p style="line-height: 1.3em;">
+						К сожалению, оператор отключился или ушел на перерыв.<br>
+						<span class="online-label">Переключитесь на другого оператора или отправьте нам сообщение.</span>
+						<span class="offline-label" style="display: none;">Отправьте нам сообщение и мы обязательно ответим.</span>
+					</p>
+
+					<p style="line-height: 2em; margin-top: 1.5em;" align="center">
+						<span class="online-buttons">
+							<a href="#" class="btn btn-success" onclick="$('#goingOffline').slideUp(200); $('.operators-list').slideDown(200); return false;">К другому оператору</a><br>
+							или<br>
+						</span>
+						<a href="#" class="btn btn-info" onclick="$('#goingOffline').hide(); $('#im_offline_form').slideDown(200);$('#im_panel').slideUp(200); CloudIM.initOfflineForm(); return false;">Написать сообщение</a><br>
+					</p>
+				</div>
+			</div>
+
+			<div class="im_vcard" style="display: none;">
+				<div class="im_vcard_avatar">
+					<img src="a.html" alt="" id="im_manager_avatar" class="im_avatar" width="50" height="50">
+				</div>
+				<div class="im_vcard_data">
+					<b class="im_vcard_fullname" id="im_manager_name"></b>
+					<span id="im_manager_selector"></span>
+					<a id="im_manager_selector_link" style="display: none;" href="#" onclick="$('.operators-list').show(); return false;">сменить</a>
+					
+					<div class="im_status" id="operatorStatus">Онлайн</div>
+										<div id="typing"></div>
+				</div>
+				<div class="im_clear"></div>
+			</div>
+
+			<div class="im_rate_block" style="display:none;">
+				<div class="im_rate rate-block">
+					<span class="rate-label">Оцените консультацию </span>
+					<a class="btn-rate btn-good"></a>
+					<a class="btn-rate btn-bad"></a>
+				</div>
+				<div class="im_rate rate-message-block" style="display:none;">
+					<div class="rate-label rate-message">Спасибо за оценку! <a href="#" onclick="$('.rate-message-block').hide(); $('.rate-block').show(); return false;">отменить</a></div>
+				</div>
+			</div>
+			
+			<div class="im_chat">
+				<div class="im_history" id="im_chat">
+					<div class="im_sys">
+						<div class="im_time"></div>
+						<div class="im_message chat_greeting">
+						Вы можете пообщаться с online-консультантом по интересующим вопросам. Напишите Ваше сообщение ниже.						</div>
+					</div>
+				</div>
+			</div>
+			<div class="im_form">
+				<textarea id="im_message_form">Введите сообщение и нажмите Enter</textarea>
+				<div class="im_enter"><img src="a_data/im_enter.png" alt="Отправить"></div>
+				<div class="im_clear"></div>
+			</div>
+			<div class="im_footer">
+																Чат предоставлен <a href="http://cloudim.ru/?utm_source=http%3A%2F%2Fb-t.com.ua%2Ftest_ayzenk.php&amp;utm_medium=link&amp;utm_content=widget&amp;utm_campaign=self_ad" target="_blank">Cloudim.ru</a>
+							</div>
+		</div>
+	</div>
+</div>
+
+<div id="log" style="display: none;"></div>
+
+<!-- Yandex.Metrika counter -->
+<div style="display:none;"><script type="text/javascript">
+(function(w, c) {
+    (w[c] = w[c] || []).push(function() {
+        try {
+            w.yaCounter10149811 = new Ya.Metrika({id:10149811,
+                    clickmap:true,
+                    accurateTrackBounce:true,
+                    trackHash:true,
+                    ut:"noindex"});
+        }
+        catch(e) { }
+    });
+})(window, "yandex_metrika_callbacks");
+</script></div>
+<script src="watch.js" type="text/javascript" defer="defer"></script>
+<noscript><div><img src="//mc.yandex.ru/watch/10149811?ut=noindex" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+<audio preload="auto" style="display:none;" id="sound__Pop-3-9"><source src="a_data/Pop-3-9.mp3" type="audio/mp3"><source src="a_data/Pop-3-9.ogg" type="audio/ogg"></audio><audio preload="auto" style="display:none;" id="sound__Pop-3-8"><source src="a_data/Pop-3-8.mp3" type="audio/mp3"><source src="a_data/Pop-3-8.ogg" type="audio/ogg"></audio></body></html>
